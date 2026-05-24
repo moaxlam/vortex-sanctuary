@@ -24,4 +24,11 @@ dist-ssr
 *.sw?
 
 .config/
-!.env
+.env
+.env.*
+!.env.example
+server/.env
+
+# Python
+__pycache__/
+*.py[cod]

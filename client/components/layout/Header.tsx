@@ -19,7 +19,7 @@ export function Header() {
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <Leaf className="h-5 w-5" />
           </span>
-          AgriSure
+          Agrownex
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           <NavItem to="/">Home</NavItem>

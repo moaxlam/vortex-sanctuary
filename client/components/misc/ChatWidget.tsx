@@ -8,7 +8,7 @@ interface Msg {
   text: string;
   ts: number;
 }
-const STORAGE_KEY = "agrisure_widget_chat";
+const STORAGE_KEY = "Agrownex_widget_chat";
 
 const scripts = [
   {

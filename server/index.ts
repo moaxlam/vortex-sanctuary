@@ -5,6 +5,7 @@ import { handleDemo } from "./routes/demo";
 import { handleWeather } from "./routes/weather";
 import { handleClimate } from "./routes/climate";
 import { handleGemini } from "./routes/chat";
+import { handleAgriSurePredict } from "./routes/agrisure";
 
 export function createServer() {
   const app = express();
@@ -25,6 +26,7 @@ export function createServer() {
   app.get("/api/weather", handleWeather);
   app.get("/api/climate", handleClimate);
   app.post("/api/chat/gemini", handleGemini);
+  app.post("/api/agrisure/predict", handleAgriSurePredict);
 
   return app;
 }

@@ -47,3 +47,23 @@ export interface ClimateMonthly {
   temperature_2m_mean?: number[];
   precipitation_sum?: number[];
 }
+
+// AgriSure ML (PMFBY coverage model)
+export interface AgriSurePredictRequest {
+  cropname?: string;
+  categoryname?: string;
+  insurancecompany_insurancecompanyname?: string;
+  sssyname_statename?: string;
+  sssyname_seasonname?: string;
+  sssyname_schemename?: string;
+  level3?: string;
+  [key: string]: string | number | undefined;
+}
+
+export type AgriSureTopFeature = [string, number];
+
+export interface AgriSurePredictResponse {
+  prediction: number;
+  top_features: AgriSureTopFeature[];
+  explanation: string;
+}

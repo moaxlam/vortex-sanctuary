@@ -69,7 +69,7 @@ export function Layout() {
         </div>
         <div className="border-t">
           <div className="container py-6 text-sm text-muted-foreground flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p>© {new Date().getFullYear()} AgriSure. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Agrownex. All rights reserved.</p>
             <p className="text-xs">Built with React & Express</p>
           </div>
         </div>

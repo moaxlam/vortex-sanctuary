@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-const KEY = "agrisure_partner_leads";
+const KEY = "Agrownex_partner_leads";
 
 export default function Partners() {
   const { toast } = useToast();

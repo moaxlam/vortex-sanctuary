@@ -7,7 +7,7 @@ interface Msg {
   text: string;
   ts: number;
 }
-const STORAGE_KEY = "agrisure_assistant_chat";
+const STORAGE_KEY = "Agrownex_assistant_chat";
 
 const sysPrompt = "Provide concise, friendly insurance guidance.";
 

@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { formatApiError, formatCurrency } from "@/lib/utils";
 import { Pie, PieChart, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import type {
+  AgriSurePredictRequest,
+  AgriSurePredictResponse,
+} from "@shared/api";
 
 const COLORS = ["#10b981", "#f59e0b", "#3b82f6", "#64748b"];
 
@@ -24,6 +28,19 @@ export default function Quote() {
     longitude: number;
   } | null>(null);
   const [forecast, setForecast] = useState<any>(null);
+
+  const [mlCrop, setMlCrop] = useState("Pulses");
+  const [mlCategory, setMlCategory] = useState("Pulses");
+  const [mlState, setMlState] = useState("Goa");
+  const [mlScheme, setMlScheme] = useState("Pradhan Mantri Fasal Bima Yojana");
+  const [mlInsurer, setMlInsurer] = useState(
+    "FUTURE GENERALI INDIA INSURANCE CO. LTD.",
+  );
+  const [mlLoading, setMlLoading] = useState(false);
+  const [mlError, setMlError] = useState<string | null>(null);
+  const [mlResult, setMlResult] = useState<AgriSurePredictResponse | null>(
+    null,
+  );
 
   useEffect(() => {
     // geolocate default
@@ -94,6 +111,45 @@ export default function Quote() {
     );
     const j = await r.json();
     setResults(j?.results?.slice(0, 6) || []);
+  };
+
+  const runMlPredict = async () => {
+    setMlLoading(true);
+    setMlError(null);
+    setMlResult(null);
+    const body: AgriSurePredictRequest = {
+      cropname: mlCrop,
+      categoryname: mlCategory,
+      sssyname_schemename: mlScheme,
+      sssyname_statename: mlState,
+      insurancecompany_insurancecompanyname: mlInsurer,
+    };
+    try {
+      const r = await fetch("/api/agrisure/predict", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const j = await r.json();
+      if (!r.ok) {
+        throw new Error(formatApiError(j));
+      }
+      if (typeof j?.prediction !== "number") {
+        throw new Error(formatApiError(j) || "Invalid prediction response");
+      }
+      setMlResult({
+        prediction: j.prediction,
+        top_features: Array.isArray(j.top_features) ? j.top_features : [],
+        explanation:
+          typeof j.explanation === "string"
+            ? j.explanation
+            : formatApiError(j.explanation) || "",
+      });
+    } catch (e: unknown) {
+      setMlError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setMlLoading(false);
+    }
   };
 
   return (
@@ -230,6 +286,94 @@ export default function Quote() {
           </Button>
         </aside>
       </div>
+
+      <section className="mt-12 rounded-xl border bg-card p-6">
+        <h2 className="text-xl font-bold">PMFBY coverage estimate (ML)</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Uses your LightGBM model on PMFBY data with SHAP factors and a Gemini
+          explanation. Run{" "}
+          <code className="text-xs bg-muted px-1 py-0.5 rounded">
+            pnpm dev:agrisure
+          </code>{" "}
+          in a second terminal while the app is running.
+        </p>
+
+        <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <Field label="Crop" value={mlCrop} onChange={setMlCrop} />
+          <Field label="Category" value={mlCategory} onChange={setMlCategory} />
+          <Field label="State" value={mlState} onChange={setMlState} />
+          <Field label="Scheme" value={mlScheme} onChange={setMlScheme} />
+          <div className="sm:col-span-2">
+            <Field label="Insurer" value={mlInsurer} onChange={setMlInsurer} />
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button onClick={runMlPredict} disabled={mlLoading}>
+            {mlLoading ? "Predicting…" : "Run ML estimate"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setMlCrop("Pulses");
+              setMlCategory("Pulses");
+              setMlState("Goa");
+              setMlScheme("Pradhan Mantri Fasal Bima Yojana");
+              setMlInsurer("FUTURE GENERALI INDIA INSURANCE CO. LTD.");
+            }}
+          >
+            Load sample
+          </Button>
+        </div>
+
+        {mlError && (
+          <p className="mt-4 text-sm text-destructive">{mlError}</p>
+        )}
+
+        {mlResult && (
+          <div className="mt-6 rounded-lg border bg-muted/30 p-4 space-y-3">
+            <p className="text-lg font-semibold">
+              Predicted sum insured:{" "}
+              {formatCurrency(mlResult.prediction, "INR")}
+            </p>
+            <div>
+              <p className="text-sm font-medium">Top factors (SHAP)</p>
+              <ul className="mt-1 text-sm text-muted-foreground list-disc pl-5">
+                {mlResult.top_features.map(([name, impact]) => (
+                  <li key={name}>
+                    {name}: {impact.toFixed(2)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">
+              {mlResult.explanation}
+            </p>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div>
+      <label className="text-sm font-medium">{label}</label>
+      <input
+        className="mt-1 h-10 w-full rounded-md border px-3"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </div>
   );
 }

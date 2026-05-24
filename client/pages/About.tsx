@@ -1,9 +1,9 @@
 export default function About() {
   return (
     <div className="container py-12">
-      <h1 className="text-3xl font-bold">About AgriSure</h1>
+      <h1 className="text-3xl font-bold">About Agrownex</h1>
       <p className="text-muted-foreground max-w-prose">
-        AgriSure protects farmers with modern insurance, weather intelligence
+        Agrownex protects farmers with modern insurance, weather intelligence
         and human support. We partner with trusted insurers and local networks
         to make cover simple and reliable.
       </p>

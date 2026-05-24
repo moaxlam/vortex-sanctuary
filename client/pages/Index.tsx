@@ -21,7 +21,7 @@ export default function Index() {
               Trusted insurance for farmers
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-              Protect your farm with AgriSure
+              Protect your farm with Agrownex
             </h1>
             <p className="mt-4 text-lg text-muted-foreground max-w-prose">
               Crop, livestock, health and motor insurance built for agriculture.

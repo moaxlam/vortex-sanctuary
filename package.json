@@ -12,6 +12,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:agrisure": "py -3 -m uvicorn server:app --reload --host 127.0.0.1 --port 8000 --app-dir AgriSure/AgriSure",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build",
     "build:server": "vite build --config vite.config.server.ts",

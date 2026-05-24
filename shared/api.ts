@@ -56,6 +56,14 @@ export interface AgriSurePredictRequest {
   sssyname_statename?: string;
   sssyname_seasonname?: string;
   sssyname_schemename?: string;
+  /** District name, e.g. North Goa (maps to level3name in PMFBY data) */
+  district?: string;
+  level3name?: string;
+  /** Season, e.g. Kharif (maps to sssyname_seasonname) */
+  season?: string;
+  /** Optional reference amount to match PMFBY records; model still predicts sum insured */
+  suminsured?: number | string;
+  reference_suminsured?: number | string;
   level3?: string;
   [key: string]: string | number | undefined;
 }

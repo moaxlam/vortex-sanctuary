@@ -36,6 +36,51 @@ df_original.columns = (
 )
 
 
+# UI / API aliases → CSV column names
+FIELD_ALIASES = {
+    "district": "level3name",
+    "season": "sssyname_seasonname",
+    "suminsured": "suminsured",
+    "reference_suminsured": "suminsured",
+}
+
+
+def normalize_payload(data: dict) -> dict:
+    normalized: dict = {}
+    for key, value in data.items():
+        if value is None or (isinstance(value, str) and not value.strip()):
+            continue
+        col = FIELD_ALIASES.get(key, key)
+        normalized[col] = value
+    return normalized
+
+
+def select_base_row(data: dict) -> pd.DataFrame:
+    """Pick a PMFBY row that best matches user inputs (district, season, etc.)."""
+    criteria = normalize_payload(data)
+    matched = df_original.copy()
+
+    for col, value in criteria.items():
+        if col not in matched.columns:
+            continue
+        if col == "suminsured":
+            try:
+                target = float(value)
+                matched = matched[
+                    (matched[col].astype(float) - target).abs() < 1.0
+                ]
+            except (TypeError, ValueError):
+                continue
+        else:
+            matched = matched[
+                matched[col].astype(str).str.lower() == str(value).lower()
+            ]
+
+    if matched.empty:
+        return df_original.iloc[[0]].copy()
+    return matched.iloc[[0]].copy()
+
+
 def align(df: pd.DataFrame, feature_cols: list[str]) -> pd.DataFrame:
     df = df.copy()
     for col in feature_cols:
@@ -60,9 +105,10 @@ async def health():
 
 @app.post("/predict")
 async def predict(data: dict):
-    base = df_original.iloc[[0]].copy()
+    criteria = normalize_payload(data)
+    base = select_base_row(data)
 
-    for key, value in data.items():
+    for key, value in criteria.items():
         if key in base.columns:
             base[key] = value
 

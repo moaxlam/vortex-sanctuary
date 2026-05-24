@@ -14,7 +14,10 @@ const data = {
   categoryname: document.getElementById("categoryname").value,
   insurancecompany_insurancecompanyname: document.getElementById("insurancecompany").value,
   sssyname_schemename: document.getElementById("scheme").value,
-  sssyname_statename: document.getElementById("state").value
+  sssyname_statename: document.getElementById("state").value,
+  district: document.getElementById("district").value,
+  season: document.getElementById("season").value,
+  suminsured: document.getElementById("suminsured").value
 };
 
   try {

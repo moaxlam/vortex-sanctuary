@@ -36,6 +36,9 @@ export default function Quote() {
   const [mlInsurer, setMlInsurer] = useState(
     "FUTURE GENERALI INDIA INSURANCE CO. LTD.",
   );
+  const [mlDistrict, setMlDistrict] = useState("North Goa");
+  const [mlSeason, setMlSeason] = useState("Kharif");
+  const [mlReferenceSumInsured, setMlReferenceSumInsured] = useState("37500");
   const [mlLoading, setMlLoading] = useState(false);
   const [mlError, setMlError] = useState<string | null>(null);
   const [mlResult, setMlResult] = useState<AgriSurePredictResponse | null>(
@@ -123,6 +126,9 @@ export default function Quote() {
       sssyname_schemename: mlScheme,
       sssyname_statename: mlState,
       insurancecompany_insurancecompanyname: mlInsurer,
+      district: mlDistrict,
+      season: mlSeason,
+      suminsured: mlReferenceSumInsured,
     };
     try {
       const r = await fetch("/api/agrisure/predict", {
@@ -302,6 +308,15 @@ export default function Quote() {
           <Field label="Crop" value={mlCrop} onChange={setMlCrop} />
           <Field label="Category" value={mlCategory} onChange={setMlCategory} />
           <Field label="State" value={mlState} onChange={setMlState} />
+          <Field label="District" value={mlDistrict} onChange={setMlDistrict} />
+          <Field label="Season" value={mlSeason} onChange={setMlSeason} />
+          <Field
+            label="Reference sum insured (INR)"
+            value={mlReferenceSumInsured}
+            onChange={setMlReferenceSumInsured}
+            type="number"
+            hint="Optional: narrows PMFBY lookup. Model predicts the amount below."
+          />
           <Field label="Scheme" value={mlScheme} onChange={setMlScheme} />
           <div className="sm:col-span-2">
             <Field label="Insurer" value={mlInsurer} onChange={setMlInsurer} />
@@ -321,6 +336,9 @@ export default function Quote() {
               setMlState("Goa");
               setMlScheme("Pradhan Mantri Fasal Bima Yojana");
               setMlInsurer("FUTURE GENERALI INDIA INSURANCE CO. LTD.");
+              setMlDistrict("North Goa");
+              setMlSeason("Kharif");
+              setMlReferenceSumInsured("37500");
             }}
           >
             Load sample
@@ -361,19 +379,27 @@ function Field({
   label,
   value,
   onChange,
+  type = "text",
+  hint,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  type?: string;
+  hint?: string;
 }) {
   return (
     <div>
       <label className="text-sm font-medium">{label}</label>
       <input
+        type={type}
         className="mt-1 h-10 w-full rounded-md border px-3"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
+      {hint ? (
+        <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
+      ) : null}
     </div>
   );
 }
